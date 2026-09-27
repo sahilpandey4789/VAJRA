@@ -1,0 +1,21 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+psycopg2-binary>=2.9  # PostgreSQL driver - required in production (docker-compose sets DATABASE_URL).
+                      # Not imported unless DATABASE_URL is set, so local SQLite/test runs don't need it installed.
+scikit-learn>=1.3
+numpy>=1.24
+pandas>=2.0
+requests>=2.31
+reportlab>=4.0
+PyJWT>=2.7
+argon2-cffi>=23.1
+
+# Test-only - powers fastapi.testclient in tests/test_api_integration.py
+# (real HTTP-shaped requests against the app, not needed to run the server)
+httpx>=0.27
+
+# Optional - QR code in evidence PDFs (falls back to SHA-256 text if absent)
+# qrcode[pil]>=7.4
+
+# Optional - real Redis cache (falls back to in-memory TTL cache if absent)
+# redis>=5.0
