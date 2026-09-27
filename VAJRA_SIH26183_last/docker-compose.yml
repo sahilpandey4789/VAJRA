@@ -1,0 +1,59 @@
+services:
+  # VAJRA backend + frontend (single container, both served)
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      VAJRA_ENV: production
+      VAJRA_JWT_SECRET: ${VAJRA_JWT_SECRET:?set VAJRA_JWT_SECRET in your .env file - see .env.example}
+      DATABASE_URL: postgresql://vajra:${POSTGRES_PASSWORD:-vajra_demo_password}@db:5432/vajra
+      VAJRA_ALLOWED_ORIGIN: ${VAJRA_ALLOWED_ORIGIN:-*}
+      # Live blockchain mode - off (0) by default so the demo never
+      # depends on a third-party API being up. Set these in a .env file
+      # next to this compose file (see .env.example) to turn it on;
+      # docker compose loads .env automatically, no extra flag needed.
+      VAJRA_LIVE_MODE: ${VAJRA_LIVE_MODE:-0}
+      ETHERSCAN_API_KEY: ${ETHERSCAN_API_KEY:-}
+      TRONGRID_API_KEY: ${TRONGRID_API_KEY:-}
+      VAJRA_API_TIMEOUT: ${VAJRA_API_TIMEOUT:-8}
+      VAJRA_API_MAX_RETRIES: ${VAJRA_API_MAX_RETRIES:-3}
+      VAJRA_LIVE_CACHE_TTL: ${VAJRA_LIVE_CACHE_TTL:-120}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # curl isn't in python:3.12-slim by default - using it here would make
+      # this healthcheck always report unhealthy even when the app is fine.
+      # python3 (already in the image) hitting the endpoint via urllib needs
+      # nothing extra installed.
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/stats', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vajra
+      POSTGRES_DB: vajra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vajra_demo_password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # host:container - only needed if you want to connect to this DB directly
+      # from your machine (pgAdmin/DBeaver etc). Left side changed from the
+      # default 5432 since a locally-installed Postgres often already holds
+      # that port; the app container always talks to "db:5432" internally,
+      # so this doesn't affect the app itself.
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vajra -d vajra"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

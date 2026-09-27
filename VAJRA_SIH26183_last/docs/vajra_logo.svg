@@ -1,0 +1,97 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="navyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b1f3a"/>
+      <stop offset="100%" stop-color="#081428"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9933"/>
+      <stop offset="55%" stop-color="#ffd27f"/>
+      <stop offset="100%" stop-color="#ff9933"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#1e90ff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#1e90ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Shield outline -->
+  <path d="M256 24 L432 92 V248 C432 356 358 428 256 480 C154 428 80 356 80 248 V92 Z"
+        fill="url(#navyGrad)" stroke="#4fc3f7" stroke-width="4"/>
+
+  <!-- Inner glow -->
+  <path d="M256 24 L432 92 V248 C432 356 358 428 256 480 C154 428 80 356 80 248 V92 Z"
+        fill="url(#glow)"/>
+
+  <!-- Circuit ring lines -->
+  <g stroke="#4fc3f7" stroke-width="1.6" fill="none" opacity="0.55">
+    <circle cx="256" cy="252" r="150"/>
+    <path d="M106 252 H150 M362 252 H406 M256 102 V146 M256 358 V402"/>
+    <circle cx="150" cy="252" r="4" fill="#4fc3f7"/>
+    <circle cx="362" cy="252" r="4" fill="#4fc3f7"/>
+    <circle cx="256" cy="146" r="4" fill="#4fc3f7"/>
+    <circle cx="256" cy="358" r="4" fill="#4fc3f7"/>
+    <path d="M130 180 L178 160 M334 180 L382 160" opacity="0.4"/>
+    <circle cx="178" cy="160" r="3" fill="#4fc3f7"/>
+    <circle cx="334" cy="160" r="3" fill="#4fc3f7"/>
+  </g>
+
+  <!-- Ashoka Chakra style ring (24 spokes, simplified to ticks) -->
+  <g stroke="#e8f1ff" stroke-width="2" opacity="0.85">
+    <circle cx="256" cy="252" r="96" fill="none" stroke="#e8f1ff" stroke-width="2.5"/>
+    <g id="spokes">
+      <!-- 24 tick marks -->
+      <line x1="256" y1="156" x2="256" y2="168"/>
+    </g>
+  </g>
+  <g fill="none" stroke="#e8f1ff" stroke-width="2">
+    <!-- generate 24 spokes via repeated transforms -->
+    <g>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(0 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(15 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(30 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(45 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(60 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(75 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(90 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(105 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(120 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(135 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(150 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(165 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(180 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(195 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(210 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(225 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(240 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(255 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(270 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(285 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(300 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(315 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(330 256 252)"/>
+      <line x1="256" y1="156" x2="256" y2="170" transform="rotate(345 256 252)"/>
+    </g>
+  </g>
+
+  <!-- Vajra bolt (thunderbolt) as central emblem -->
+  <path d="M270 168
+           L226 258
+           L252 258
+           L232 336
+           L306 236
+           L276 236
+           L296 168
+           Z"
+        fill="url(#boltGrad)" stroke="#8a4b00" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Small vajra prongs top/bottom for authenticity -->
+  <path d="M244 160 Q256 146 268 160 L262 168 L250 168 Z" fill="#ffd27f" stroke="#8a4b00" stroke-width="1"/>
+  <path d="M212 336 Q224 328 234 336 L228 344 L216 344 Z" fill="#ffd27f" stroke="#8a4b00" stroke-width="1" opacity="0.9"/>
+
+  <!-- Title -->
+  <text x="256" y="452" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="38" font-weight="700" fill="#e8f1ff" letter-spacing="6">VAJRA</text>
+  <text x="256" y="472" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="11" fill="#4fc3f7" letter-spacing="3">CYBER FINANCIAL INTELLIGENCE</text>
+</svg>

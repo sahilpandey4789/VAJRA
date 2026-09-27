@@ -1,0 +1,266 @@
+/* ================= login ================= */
+#loginScreen{
+  position:fixed; inset:0; z-index:60; display:none; align-items:stretch; justify-content:center;
+  background:var(--ink); padding:0;
+}
+#loginScreen.show{display:flex;}
+.login-shell{
+  width:100%; max-width:980px; margin:auto; min-height:min(600px, 92vh);
+  display:grid; grid-template-columns:1.05fr 1fr; border-radius:var(--r-lg); overflow:hidden;
+  box-shadow:var(--shadow-lg), var(--glow-cyan); border:1px solid rgba(255,255,255,.08);
+}
+.brandmark{display:flex; align-items:center; gap:12px;}
+.brandmark-name{font-family:var(--font-serif); font-size:var(--fs-lg); font-weight:700; color:var(--paper-text); letter-spacing:.01em;}
+.brandmark-sub{font-size:var(--fs-xs); color:var(--paper-text-soft);}
+
+/* ---- Government-of-India insignia touches ----
+   A single 3px tricolour rule at the very top of a screen (app shell,
+   login, landing) plus a small gold "seal" badge near the brandmark.
+   Used exactly once per screen and kept small/desaturated on purpose - the ask was "official, not a flag graphic". */
+.gov-strip{
+  position:fixed; top:0; left:0; right:0; height:3px; background:var(--tricolor-rule);
+  z-index:999; pointer-events:none;
+}
+.gov-seal{
+  width:26px; height:26px; flex-shrink:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 30% 25%, rgba(212,175,55,.22), transparent 70%), var(--ink-2);
+  border:1px solid var(--gov-gold-soft); box-shadow:var(--glow-gold);
+}
+.gov-seal svg{display:block;}
+.gov-badge{
+  display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:var(--r-full);
+  border:1px solid var(--gov-gold-tint); background:var(--gov-gold-tint); color:var(--gov-gold);
+  font-size:var(--fs-2xs); font-weight:700; letter-spacing:.07em; text-transform:uppercase; white-space:nowrap;
+}
+.gov-badge svg{width:12px; height:12px; flex-shrink:0;}
+html[data-theme="light"] .gov-badge{color:var(--gov-gold-deep); border-color:rgba(212,175,55,.35); background:rgba(212,175,55,.12);}
+html[data-theme="light"] .gov-seal{background:radial-gradient(circle at 30% 25%, rgba(212,175,55,.16), transparent 70%), #FFFFFF;}
+@media (max-width: 640px){ .gov-badge{display:none;} }
+
+.login-aside{
+  position:relative; padding:44px 40px; display:flex; flex-direction:column; justify-content:space-between;
+  background:var(--ink-2);
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(34,211,238,.20), transparent 46%),
+    radial-gradient(circle at 90% 92%, rgba(167,139,250,.22), transparent 50%),
+    repeating-linear-gradient(180deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px);
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.login-aside-copy h1{
+  font-family:var(--font-serif); font-weight:700; font-size:28px; line-height:1.22; color:var(--paper-text);
+  margin:30px 0 14px; letter-spacing:-.01em;
+}
+.login-aside-copy p{font-size:var(--fs-sm); color:var(--paper-text-soft); line-height:1.65; max-width:34ch;}
+.login-hopflow{width:100%; height:auto; margin:8px 0 0; opacity:.95;}
+.hop-pulse{filter:drop-shadow(0 0 6px rgba(34,211,238,.85));}
+.login-aside-foot{font-size:var(--fs-2xs); color:var(--paper-text-faint); letter-spacing:.02em;}
+
+.login-main{background:var(--ink); padding:44px 40px; display:flex; align-items:center; justify-content:center;}
+.login-card{width:100%; max-width:340px; color:var(--paper-text);}
+.login-card .title{font-family:var(--font-serif); font-size:var(--fs-xl); font-weight:700; color:var(--paper-text); margin-bottom:4px;}
+.login-card .sub{font-size:var(--fs-sm); color:var(--paper-text-soft); margin-bottom:24px; line-height:1.55;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:var(--fs-xs); color:var(--paper-text-soft); margin-bottom:5px; letter-spacing:.01em;}
+.login-card input,.login-card select{
+  width:100%; border-radius:var(--r-sm); border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03); padding:11px 12px; font-size:var(--fs-base); color:var(--paper-text);
+  transition:border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.login-card input:focus,.login-card select:focus{outline:none; border-color:var(--copper); box-shadow:var(--focus-ring); background:rgba(34,211,238,.04);}
+.login-submit{
+  width:100%; border:none; border-radius:var(--r-sm); background:var(--accent-gradient); padding:12px; font-size:var(--fs-base);
+  font-weight:700; color:var(--accent-ink); margin-top:6px; transition:filter var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+}
+.login-submit:hover{filter:brightness(1.08); box-shadow:var(--glow-cyan);}
+.login-submit[disabled]{opacity:.55; cursor:not-allowed;}
+.login-error{
+  font-size:var(--fs-xs); color:var(--tone-rose-text); background:rgba(251,113,133,.14); border:1px solid rgba(251,113,133,.35);
+  border-radius:var(--r-sm); padding:9px 11px; margin-bottom:14px; display:none;
+}
+.login-error.show{display:block;}
+
+/* Demo access - deliberately unobtrusive: closed by default, one line,
+   no visible password/role list until an officer chooses to open it. */
+.demo-access{margin-top:22px; border-top:1px solid rgba(255,255,255,.08); padding-top:14px;}
+.demo-access summary{
+  font-size:var(--fs-xs); color:var(--paper-text-soft); cursor:pointer; list-style:none; user-select:none;
+  display:flex; align-items:center; gap:6px;
+}
+.demo-access summary::before{content:"›"; display:inline-block; transition:transform var(--dur-fast) var(--ease); color:var(--copper);}
+.demo-access[open] summary::before{transform:rotate(90deg);}
+.demo-access summary::-webkit-details-marker{display:none;}
+.demo-access .role-tabs{display:flex; gap:6px; margin:12px 0 8px;}
+.role-tab{
+  flex:1; text-align:center; padding:8px 4px; border-radius:var(--r-sm); border:1px solid rgba(255,255,255,.1);
+  font-size:var(--fs-2xs); color:var(--paper-text-soft); background:rgba(255,255,255,.03); letter-spacing:.02em; cursor:pointer;
+  transition:all var(--dur-fast) var(--ease);
+}
+.role-tab.active{border-color:var(--copper); color:var(--tone-violet-text); background:var(--copper-tint);}
+.demo-hint{font-size:var(--fs-2xs); color:var(--paper-text-faint); line-height:1.55;}
+.demo-hint code{color:var(--copper);}
+
+@media (max-width:760px){
+  .login-shell{grid-template-columns:1fr; max-width:420px;}
+  .login-aside{display:none;}
+  .login-main{padding:36px 26px;}
+}
+
+/* ================= light mode: login/signup screen. This was the one
+   surface with NO light-mode override at all - the
+   --ink/--paper-text token flip (tokens.css) already re-colors the
+   background and main text, but a handful of subtle rgba(255,255,255,.x)
+   borders/fills below were tuned assuming a dark base and go invisible
+   on the new light one (fields look border-less, "neither light nor
+   dark"). Re-tuned here the same way topbar/sidebar already were. ===== */
+html[data-theme="light"] .login-shell{border-color:var(--line-strong);}
+html[data-theme="light"] .login-aside{border-right-color:var(--line);}
+html[data-theme="light"] .login-card input,
+html[data-theme="light"] .login-card select{
+  background:#FFFFFF; border-color:var(--line-strong);
+}
+html[data-theme="light"] .login-card input:focus,
+html[data-theme="light"] .login-card select:focus{background:var(--copper-tint);}
+html[data-theme="light"] .demo-access{border-top-color:var(--line-strong);}
+html[data-theme="light"] .role-tab{background:#FFFFFF; border-color:var(--line-strong);}
+html[data-theme="light"] .role-tab.active{border-color:var(--copper); background:var(--copper-tint);}
+
+/* ================= app shell ================= */
+#app{display:none; height:100vh; width:100vw; flex-direction:column;}
+#app.active{display:flex;}
+.topbar{
+  height:var(--topbar-h); flex-shrink:0; background:linear-gradient(90deg, var(--ink), var(--ink-2)); display:flex; align-items:center;
+  padding:0 var(--sp-4); gap:var(--sp-4); border-bottom:1px solid rgba(34,211,238,.18); position:relative; z-index:20;
+  box-shadow:0 1px 0 rgba(34,211,238,.06), 0 4px 20px rgba(0,0,0,.35);
+}
+.topbar::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:var(--accent-gradient); opacity:.55;
+}
+.topbar .brandmark-name{font-size:var(--fs-base);}
+.topbar .brandmark svg{stroke:var(--copper-deep);}
+html[data-theme="dark"] .topbar .brandmark svg{stroke:var(--copper);}
+.tb-mode{
+  font-size:var(--fs-2xs); padding:2px 8px; border-radius:var(--r-full); letter-spacing:.04em; font-weight:700;
+}
+.tb-mode.live{background:var(--sage-tint); color:var(--sage); box-shadow:0 0 8px rgba(45,212,191,.25);}
+.tb-mode.cached{background:var(--brass-tint); color:var(--brass);}
+.tb-spacer{flex:1;}
+.tb-case{font-size:var(--fs-sm); color:var(--paper-text-soft); font-family:var(--font-mono); display:none;}
+.tb-officer{
+  display:flex; align-items:center; gap:10px; padding-left:var(--sp-4);
+  border-left:1px solid rgba(255,255,255,.1);
+}
+.tb-avatar{
+  width:30px; height:30px; border-radius:50%; background:var(--accent-gradient); display:flex; align-items:center;
+  justify-content:center; font-size:var(--fs-xs); font-weight:700; color:var(--accent-ink); flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(34,211,238,.25);
+}
+.tb-officer-text{display:flex; flex-direction:column; line-height:1.32; min-width:0;}
+.tb-officer-name{
+  font-size:var(--fs-sm); font-weight:600; color:var(--paper-text); white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; max-width:160px;
+}
+.tb-officer-role{font-size:var(--fs-2xs); color:var(--paper-text-soft); text-transform:capitalize; letter-spacing:.02em;}
+.tb-logout{
+  background:transparent; border:1px solid rgba(255,255,255,.16); color:var(--paper-text-soft); font-size:var(--fs-xs);
+  padding:6px 12px; border-radius:var(--r-sm); transition:all var(--dur-fast) var(--ease);
+}
+.tb-logout:hover{border-color:var(--crimson); color:var(--tone-rose-text);}
+.tb-icon-btn{
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:var(--r-sm);
+  color:var(--paper-text-soft); position:relative; transition:all var(--dur-fast) var(--ease);
+}
+.tb-icon-btn:hover{background:rgba(34,211,238,.1); color:var(--paper-text);}
+.tb-badge{
+  position:absolute; top:2px; right:2px; width:7px; height:7px; border-radius:50%; background:var(--risk-high);
+  border:1.5px solid var(--ink); box-shadow:0 0 6px var(--risk-high);
+}
+
+.shell{flex:1; display:flex; min-height:0;}
+
+/* ---- sidebar ---- */
+.sidebar{width:var(--sidebar-w); flex-shrink:0; background:linear-gradient(180deg, var(--ink-2), var(--ink)); display:flex; flex-direction:column; padding:var(--sp-4) 0; overflow-y:auto; border-right:1px solid rgba(255,255,255,.06);}
+.nav-group-label{font-size:var(--fs-2xs); letter-spacing:.09em; color:var(--paper-text-faint); padding:6px var(--sp-4); margin-top:6px; text-transform:uppercase; font-weight:600;}
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:9px var(--sp-4); font-size:var(--fs-sm); color:var(--paper-text-soft);
+  border-left:2px solid transparent; width:100%; text-align:left;
+  transition:background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.nav-item:hover{background:rgba(34,211,238,.05); color:var(--paper-text);}
+.nav-item.active{background:linear-gradient(90deg, rgba(34,211,238,.14), transparent); border-left-color:var(--copper); color:var(--tone-violet-text); box-shadow:inset 0 0 20px rgba(34,211,238,.06);}
+.nav-icon{width:15px; height:15px; flex-shrink:0; opacity:.9;}
+.nav-item-count{
+  margin-left:auto; font-size:var(--fs-2xs); background:rgba(255,255,255,.08); color:var(--paper-text-soft);
+  padding:1px 6px; border-radius:var(--r-full);
+}
+.sidebar-divider{height:1px; background:rgba(255,255,255,.06); margin:var(--sp-4) var(--sp-4);}
+.queue-list{overflow-y:auto;}
+.queue-item{
+  padding:9px var(--sp-4); border-left:2px solid transparent; width:100%; text-align:left; cursor:pointer;
+  transition:background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.queue-item:hover{background:rgba(34,211,238,.05);}
+.queue-item.active{background:linear-gradient(90deg, rgba(34,211,238,.14), transparent); border-left-color:var(--copper);}
+.queue-id{font-family:var(--font-mono); font-size:var(--fs-xs); color:var(--paper-text-soft);}
+.queue-meta{display:flex; align-items:center; gap:6px; margin-top:3px;}
+.queue-risk-dot{width:6px; height:6px; border-radius:50%; flex-shrink:0;}
+.queue-wallet{font-size:var(--fs-2xs); color:var(--paper-text-faint); font-family:var(--font-mono);}
+.sidebar-foot{margin-top:auto; padding:var(--sp-3) var(--sp-4) 2px; font-size:var(--fs-2xs); color:var(--paper-text-faint); line-height:1.6;}
+
+/* ---- main ---- */
+.main{
+  flex:1; overflow-y:auto; background:
+    radial-gradient(circle at 15% 0%, rgba(34,211,238,.05), transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(167,139,250,.045), transparent 42%),
+    var(--paper);
+  position:relative;
+}
+.view{display:none; padding:var(--sp-6) var(--sp-7) 70px; max-width:1180px; margin:0 auto;}
+.view.active{display:block; animation:fadein var(--dur-slow) var(--ease);}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+.view-head{display:flex; align-items:flex-start; justify-content:space-between; gap:var(--sp-4); margin-bottom:var(--sp-6); flex-wrap:wrap;}
+.view-title{font-family:var(--font-serif); font-size:var(--fs-2xl); font-weight:700; color:var(--text); letter-spacing:-.01em;}
+.view-sub{font-size:var(--fs-sm); color:var(--text-soft); margin-top:3px;}
+
+/* ---- mobile bottom nav (hidden by default, shown via responsive.css) ---- */
+.bottom-nav{display:none;}
+
+/* ---- generic page loader / empty states ---- */
+.empty-state{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:var(--sp-9) var(--sp-5); color:var(--text-soft);
+}
+.empty-state svg{opacity:.4; margin-bottom:var(--sp-3);}
+.empty-state .t{font-family:var(--font-serif); font-size:var(--fs-md); color:var(--text); margin-bottom:4px;}
+.empty-state .s{font-size:var(--fs-sm); max-width:340px;}
+
+/* ================= light mode: topbar + sidebar become real light
+   chrome instead of a forced-dark bar, so the toggle gives a fully
+   coherent light theme (not half-dark/half-light). ================= */
+html[data-theme="light"] .topbar{
+  background:linear-gradient(90deg, #FFFFFF, #F7F9FC); border-bottom-color:rgba(34,211,238,.25);
+  box-shadow:0 1px 0 rgba(34,211,238,.1), 0 4px 16px rgba(15,23,42,.05);
+}
+html[data-theme="light"] .brandmark-name{color:var(--text);}
+html[data-theme="light"] .tb-case{color:var(--text-soft);}
+html[data-theme="light"] .tb-officer{border-left-color:var(--line);}
+html[data-theme="light"] .tb-officer-name{color:var(--text);}
+html[data-theme="light"] .tb-officer-role{color:var(--text-soft);}
+html[data-theme="light"] .tb-icon-btn{color:var(--text-soft);}
+html[data-theme="light"] .tb-icon-btn:hover{background:var(--copper-tint); color:var(--copper-deep);}
+html[data-theme="light"] .tb-logout{border-color:var(--line-strong); color:var(--text-soft);}
+html[data-theme="light"] .tb-badge{border-color:#FFFFFF;}
+
+html[data-theme="light"] .sidebar{background:linear-gradient(180deg, #FFFFFF, #F7F9FC); border-right-color:var(--line);}
+html[data-theme="light"] .nav-group-label{color:var(--text-faint);}
+html[data-theme="light"] .nav-item{color:var(--text-soft);}
+html[data-theme="light"] .nav-item:hover{background:var(--copper-tint); color:var(--text);}
+html[data-theme="light"] .nav-item.active{background:linear-gradient(90deg, rgba(34,211,238,.14), transparent); color:var(--copper-deep); box-shadow:none;}
+html[data-theme="light"] .nav-item-count{background:var(--line); color:var(--text-soft);}
+html[data-theme="light"] .sidebar-divider{background:var(--line);}
+html[data-theme="light"] .queue-item:hover{background:var(--copper-tint);}
+html[data-theme="light"] .queue-id{color:var(--text);}
+html[data-theme="light"] .queue-wallet{color:var(--text-faint);}
+html[data-theme="light"] .sidebar-foot{color:var(--text-faint);}
