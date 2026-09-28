@@ -31,6 +31,12 @@
 
   .tb-case{display:none;}
   .tb-officer-text{display:none;}
+  .tb-logout{display:none;}
+  .more-logout{
+    display:block; width:100%; margin-top:18px; padding:12px 16px; border-radius:var(--r-sm, 8px);
+    border:1px solid var(--risk-high, #e5484d); color:var(--risk-high, #e5484d);
+    background:transparent; font-weight:600; text-align:center;
+  }
 
   /* two-column trace grid -> single column, graph first (primary "what happened" answer) */
   .trace-grid{grid-template-columns:1fr;}
