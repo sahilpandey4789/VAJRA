@@ -278,6 +278,7 @@ export default function Console() {
               </div>
             </>
           )}
+          <button className="more-logout" onClick={async () => { setShowMore(false); await logout(); }}>Sign out</button>
         </div>
       )}
       <nav className="bottom-nav" aria-label="Primary mobile">
