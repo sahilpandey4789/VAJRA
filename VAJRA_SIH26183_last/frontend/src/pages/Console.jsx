@@ -141,6 +141,7 @@ export default function Console() {
 
   return (
     <div id="app" className="active">
+      <style>{`@media (max-width:767px){ .tb-logout{display:none !important;} }`}</style>
       <div className="gov-strip" aria-hidden="true"></div>
       <header className="topbar">
         <div className="brandmark">
@@ -278,8 +279,7 @@ export default function Console() {
               </div>
             </>
           )}
-          <button className="more-logout" onClick={async () => { setShowMore(false); await logout(); }}>Sign out</button>
-        </div>
+         <button className="more-logout" style={{ display: "block", width: "100%", marginTop: 18, padding: "12px 16px", borderRadius: 10, border: "1px solid #e5484d", color: "#e5484d", background: "transparent", fontWeight: 600, fontSize: 15, textAlign: "center" }} onClick={async () => { setShowMore(false); await logout(); }}>Sign out</button>
       )}
       <nav className="bottom-nav" aria-label="Primary mobile">
         {BOTTOM_NAV_ITEMS.map((n) => (
