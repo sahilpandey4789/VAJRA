@@ -76,6 +76,12 @@ export default function Landing({ onAuth, onReport, onTrack }) {
           <a href="#landingFeatures" onClick={scrollTo("landingFeatures")}>How it works</a>
           <a href="#landingAbout" onClick={scrollTo("landingAbout")}>About</a>
           <a href="#landingDemo" onClick={scrollTo("landingDemo")}>Demo</a>
+          <div className="drawer-actions">
+            <button className="l-btn l-btn-ghost" onClick={() => { setMenuOpen(false); onReport(); }}>Report a suspect wallet</button>
+            <button className="l-btn l-btn-ghost" onClick={() => { setMenuOpen(false); onTrack(); }}>Track your report</button>
+            <button className="l-btn l-btn-ghost drawer-auth" onClick={() => { setMenuOpen(false); onAuth("signin"); }}>Sign in</button>
+            <button className="l-btn l-btn-solid drawer-auth" onClick={() => { setMenuOpen(false); onAuth("signup"); }}>Create account</button>
+          </div>
         </div>
         <div className="l-nav-spacer"></div>
         <div className="l-nav-actions">
@@ -84,10 +90,10 @@ export default function Landing({ onAuth, onReport, onTrack }) {
               ? <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="10" cy="10" r="3.4"/><path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1L4.7 4.7"/></svg>
               : <svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M17 11.2A7 7 0 1 1 8.8 3 5.6 5.6 0 0 0 17 11.2z"/></svg>}
           </button>
-          <button className="l-btn l-btn-ghost" onClick={onReport}>Report a suspect wallet</button>
-          <button className="l-btn l-btn-ghost" onClick={onTrack}>Track your report</button>
-          <button className="l-btn l-btn-ghost" onClick={() => onAuth("signin")}>Sign in</button>
-          <button className="l-btn l-btn-solid" onClick={() => onAuth("signup")}>Create account</button>
+          <button className="l-btn l-btn-ghost nav-act-extra" onClick={onReport}>Report a suspect wallet</button>
+          <button className="l-btn l-btn-ghost nav-act-extra" onClick={onTrack}>Track your report</button>
+          <button className="l-btn l-btn-ghost nav-act-auth" onClick={() => onAuth("signin")}>Sign in</button>
+          <button className="l-btn l-btn-solid nav-act-auth" onClick={() => onAuth("signup")}>Create account</button>
           <button className="l-icon-btn" id="landingNavToggle" aria-label="Menu" aria-expanded={menuOpen} aria-controls="landingNavLinks"
                   onClick={() => setMenuOpen((o) => !o)}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 5h14M3 10h14M3 15h14"/></svg>

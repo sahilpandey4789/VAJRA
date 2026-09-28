@@ -1,5 +1,6 @@
 *,*::before,*::after{box-sizing:border-box;}
 html,body{height:100%;margin:0;}
+html,body{overflow-x:clip; max-width:100%;}
 body{
   font-family:var(--font-sans); color:var(--text); background:var(--paper);
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;

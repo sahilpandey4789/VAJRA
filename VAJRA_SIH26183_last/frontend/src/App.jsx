@@ -17,7 +17,7 @@ function Shell() {
     return (
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "center",
-        height: "100vh", color: "var(--copper)", fontFamily: "var(--font-sans)", background: "var(--paper)",
+        minHeight: "100dvh", color: "var(--copper)", fontFamily: "var(--font-sans)", background: "var(--paper)",
       }}>
         <div style={{ textAlign: "center" }}>
           <div style={{

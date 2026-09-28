@@ -43,10 +43,9 @@ const NAV_ITEMS = [
 ];
 const BOTTOM_NAV_ITEMS = [
   { view: "dashboard", icon: "dashboard", label: "Home" },
+  { view: "reports", icon: "reports", label: "Reports" },
   { view: "trace", icon: "trace", label: "Trace" },
   { view: "notices", icon: "notices", label: "Notices" },
-  { view: "vault", icon: "vault", label: "Vault" },
-  { view: "about", icon: "about", label: "About" },
 ];
 
 export default function Console() {
@@ -57,6 +56,7 @@ export default function Console() {
   const [highRisk, setHighRisk] = useState(0);
   const [mode, setMode] = useState(api.getMode());
   const [showNotif, setShowNotif] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const notifRef = useRef(null);
 
   const viewContainerRef = useRef(null);
@@ -76,7 +76,10 @@ export default function Console() {
   const navigate = useCallback((v) => {
     document.getElementById("stepperOverlay")?.classList.remove("show");
     document.getElementById("modalVeil")?.classList.remove("show");
+    setShowMore(false);
     setView(v);
+    // legacy views share one scroll container - always start a new page at the top
+    document.getElementById("mainContent")?.scrollTo?.({ top: 0 });
   }, []);
 
   const openCase = useCallback((caseId) => {
@@ -196,7 +199,7 @@ export default function Console() {
             {highRisk > 0 && <span className="tb-badge"></span>}
           </button>
           {showNotif && (
-            <div style={{
+            <div className="notif-pop" style={{
               position: "absolute", top: "calc(100% + 8px)", right: 0, width: 300, maxHeight: 360, overflowY: "auto",
               background: "var(--ink-2, #12203a)", border: "1px solid var(--glass-border, rgba(255,255,255,.14))",
               borderRadius: "var(--r-lg, 10px)", boxShadow: "var(--shadow-lg, 0 10px 30px rgba(0,0,0,.4))", zIndex: 80,
@@ -284,12 +287,42 @@ export default function Console() {
         </main>
       </div>
 
+      {showMore && <div className="more-veil" onClick={() => setShowMore(false)} aria-hidden="true"></div>}
+      {showMore && (
+        <div className="more-sheet" role="dialog" aria-label="All sections">
+          <div className="more-grip" aria-hidden="true"></div>
+          <div className="more-grid">
+            {NAV_ITEMS.filter((n) => !n.adminOnly || officer.role === "admin").map((n) => (
+              <button key={n.view} className={`more-item ${view === n.view ? "active" : ""}`} onClick={() => navigate(n.view)}>
+                <span dangerouslySetInnerHTML={{ __html: ICONS[n.icon] }} />{n.label}
+              </button>
+            ))}
+          </div>
+          {cases.length > 0 && (
+            <>
+              <div className="more-label">Case queue</div>
+              <div className="more-queue">
+                {cases.slice(0, 8).map((c) => (
+                  <button key={c.id} className="more-case" onClick={() => { setShowMore(false); openCase(c.id); }}>
+                    <span className="queue-risk-dot" style={{ background: c.risk_band === "high" ? "var(--risk-high)" : c.risk_band === "medium" ? "var(--risk-med)" : "var(--risk-low)" }}></span>
+                    <span className="queue-id">{c.ncrp_ref}</span>
+                    <span className="queue-wallet">{shortAddr(c.suspect_wallet)}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
       <nav className="bottom-nav" aria-label="Primary mobile">
         {BOTTOM_NAV_ITEMS.map((n) => (
           <button key={n.view} className={`bn-item ${view === n.view ? "active" : ""}`} onClick={() => navigate(n.view)}>
             <span dangerouslySetInnerHTML={{ __html: ICONS[n.icon] }} />{n.label}
           </button>
         ))}
+        <button className={`bn-item ${showMore || !BOTTOM_NAV_ITEMS.some((n) => n.view === view) ? "active" : ""}`} onClick={() => setShowMore((m) => !m)} aria-expanded={showMore}>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="4.5" cy="10" r="1.3"/><circle cx="10" cy="10" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/></svg>More
+        </button>
       </nav>
     </div>
   );

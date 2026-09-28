@@ -103,6 +103,13 @@ export default function Report({ onBack }) {
         </div>
 
         <div className="login-main">
+        <div className="login-mobile-top">
+          <button type="button" className="back-to-site" onClick={onBack}>&larr; Back</button>
+          <div className="brandmark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" strokeWidth="1.4"><path d="M12 2l7 3v6c0 5-3.2 8.4-7 11-3.8-2.6-7-6-7-11V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span className="brandmark-name">VAJRA</span>
+          </div>
+        </div>
           <div className="login-card">
             {step === "register" && (
               <>

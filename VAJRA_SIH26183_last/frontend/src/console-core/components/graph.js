@@ -376,7 +376,8 @@ export function mountGraphInteractions(container, report) {
     popupEl.innerHTML = html;
     wrap.appendChild(popupEl);
     const wrapRect = wrap.getBoundingClientRect();
-    const x = Math.min(evt.clientX - wrapRect.left + 10, wrapRect.width - 200);
+    const sl = wrap.scrollLeft || 0;
+    const x = Math.min(evt.clientX - wrapRect.left + sl + 10, wrapRect.width + sl - 200);
     const y = Math.max(evt.clientY - wrapRect.top - 10, 4);
     popupEl.style.left = `${Math.max(4, x)}px`;
     popupEl.style.top = `${y}px`;

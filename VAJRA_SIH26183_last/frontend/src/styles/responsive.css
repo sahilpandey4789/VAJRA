@@ -1,74 +1,172 @@
 /*
-  Mobile responsiveness plan - Master Document section 7.1 ("required,
-  not optional"). Tested at 375px / 768px / 1440px per the doc's
-  stated minimum. Breakpoints below intentionally mirror Tailwind's
-  sm/md/lg scale even though this build is hand-rolled CSS, so the
-  thresholds match what the spec calls out by name.
+  Mobile responsiveness - whole console (topbar, navigation, every view,
+  modals, auth screens). Breakpoints: 1023 tablet / 767 phone / 480 small phone.
+  Rules of thumb used everywhere below:
+   - nothing may make the page scroll sideways (wide things scroll INSIDE their own box)
+   - tap targets >= 40px, form fields 16px (stops iOS zoom-on-focus)
+   - anything fixed to the bottom clears the bottom nav + the phone's home bar
 */
 
-/* ============ md: below 1024px - tighten desktop spacing ============ */
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
+button, a, select, summary{touch-action:manipulation; -webkit-tap-highlight-color:transparent;}
+.main, .shell, .view, .view-head > *{min-width:0;}
+.more-veil, .more-sheet{display:none;}
+
+/* ============ below 1024px - tighten desktop spacing ============ */
 @media (max-width: 1023px){
   .view{padding:var(--sp-5) var(--sp-5) 90px;}
   .stat-row{grid-template-columns:repeat(2,1fr);}
+  .trace-grid{grid-template-columns:1fr;}
 }
 
-/* ============ md: below 768px - sidebar becomes bottom tab bar ============ */
+/* ============ below 768px - phone layout ============ */
 @media (max-width: 767px){
+  /* ---- app shell ---- */
   .sidebar{display:none;}
+  .main{padding-bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom)); overflow-x:hidden; -webkit-overflow-scrolling:touch;}
+  .view{padding:var(--sp-4) var(--sp-4) 28px; overflow-wrap:anywhere;}
+  .view table th{overflow-wrap:normal;}
+
+  /* ---- topbar: brand + status + theme + bell + avatar + sign out must fit 320px ---- */
+  .topbar{padding:0 12px; gap:8px;}
+  .topbar .brandmark{gap:8px; min-width:0;}
+  .topbar .brandmark-name{font-size:var(--fs-base);}
+  .tb-case, .tb-officer-text{display:none;}
+  .tb-officer{padding-left:8px; gap:0;}
+  .tb-logout{padding:7px 10px; min-height:34px;}
+  .tb-icon-btn{width:38px; height:38px;}
+  .notif-pop{position:fixed !important; top:calc(var(--topbar-h) + 6px + 3px) !important; left:12px !important; right:12px !important; width:auto !important; max-height:70dvh !important;}
+  .offline-banner{font-size:var(--fs-xs); padding:8px 12px; line-height:1.5;}
+
+  /* ---- bottom nav (5 slots: Home / Reports / Trace / Notices / More) ---- */
   .bottom-nav{
-    display:flex; position:fixed; left:0; right:0; bottom:0; height:var(--bottom-nav-h); background:var(--ink-2);
-    border-top:1px solid rgba(255,255,255,.08); z-index:40; padding-bottom:env(safe-area-inset-bottom);
+    display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40;
+    height:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom)); padding-bottom:env(safe-area-inset-bottom);
+    background:var(--ink-2); border-top:1px solid rgba(255,255,255,.08);
   }
+  html[data-theme="light"] .bottom-nav{background:#FFFFFF; border-top-color:var(--line); box-shadow:0 -4px 16px rgba(15,23,42,.06);}
   .bn-item{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    color:var(--paper-text-soft); font-size:9.5px; letter-spacing:.01em;
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    color:var(--paper-text-soft); font-size:10.5px; letter-spacing:.01em; white-space:nowrap;
   }
+  html[data-theme="light"] .bn-item{color:var(--text-soft);}
   .bn-item.active{color:var(--tone-cyan-text);}
-  .bn-item svg{width:18px; height:18px;}
+  html[data-theme="light"] .bn-item.active{color:var(--copper-deep);}
+  .bn-item svg{width:20px; height:20px;}
   .bn-item.active svg{stroke:var(--copper);}
-  .main{padding-bottom:var(--bottom-nav-h);}
-  .view{padding:var(--sp-4) var(--sp-4) calc(var(--bottom-nav-h) + 24px);}
 
-  .tb-case{display:none;}
-  .tb-officer-text{display:none;}
-
-  /* two-column trace grid -> single column, graph first (primary "what happened" answer) */
-  .trace-grid{grid-template-columns:1fr;}
-
-  /* case table -> stacked card list */
-  .table-wrap.responsive-table{display:none;}
-  .case-cards{display:flex;}
-
-  .stat-row{grid-template-columns:1fr 1fr; gap:10px;}
-  .stat-value{font-size:var(--fs-xl);}
-
-  /* modal -> full-screen sheet */
-  .modal-veil{padding:0; align-items:flex-end;}
-  .modal-box{
-    width:100%; max-width:100%; height:92vh; max-height:92vh; border-radius:var(--r-lg) var(--r-lg) 0 0;
-    animation:sheet-up var(--dur-slow) var(--ease);
+  /* ---- "More" sheet: every section + case queue (sidebar is gone on phones) ---- */
+  .more-veil{display:block; position:fixed; inset:0; z-index:41; background:rgba(3,6,14,.55);}
+  .more-sheet{
+    display:block; position:fixed; left:0; right:0; z-index:42;
+    bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom)); max-height:72dvh; overflow-y:auto;
+    background:var(--panel-2); border:1px solid var(--line); border-bottom:none; border-radius:var(--r-lg) var(--r-lg) 0 0;
+    padding:8px 14px 18px; box-shadow:0 -12px 32px rgba(0,0,0,.4); animation:sheet-up var(--dur-slow) var(--ease);
   }
+  html[data-theme="dark"] .more-sheet{background:var(--ink-2);}
+  .more-grip{width:38px; height:4px; border-radius:var(--r-full); background:var(--line-strong); margin:4px auto 12px;}
+  .more-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .more-item{
+    display:flex; align-items:center; gap:10px; min-height:46px; padding:10px 12px; border-radius:var(--r-md);
+    border:1px solid var(--line); background:var(--panel); color:var(--text); font-size:var(--fs-sm); text-align:left;
+  }
+  .more-item svg{width:16px; height:16px; flex-shrink:0; opacity:.85;}
+  .more-item.active{border-color:var(--copper); background:var(--copper-tint);}
+  .more-label{font-size:var(--fs-2xs); letter-spacing:.09em; text-transform:uppercase; color:var(--text-faint); font-weight:600; margin:16px 2px 8px;}
+  .more-queue{display:flex; flex-direction:column;}
+  .more-case{display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 4px; border-bottom:1px solid var(--line-soft); text-align:left; width:100%; color:var(--text);}
+  .more-case .queue-id{color:var(--text);}
+  .more-case .queue-wallet{margin-left:auto;}
   @keyframes sheet-up{from{transform:translateY(24px); opacity:.6;} to{transform:none; opacity:1;}}
 
-  .notice-type-grid{grid-template-columns:1fr;}
-  .new-trace-form{flex-direction:column;}
-  .new-trace-form input, .new-trace-form select{width:100%;}
-
-  .audit-row{grid-template-columns:1fr; gap:2px;}
-}
-
-/* ============ sm: below 480px - phone fine-tuning ============ */
-@media (max-width: 480px){
-  .login-card{padding:26px 20px 22px;}
+  /* ---- page headers, stats, cards ---- */
+  .view-head{gap:var(--sp-3); margin-bottom:var(--sp-4);}
   .view-title{font-size:var(--fs-xl);}
-  .stat-row{grid-template-columns:1fr 1fr;}
-  .attribution-card .head{flex-direction:column; align-items:flex-start;}
-  .attribution-card .conf{margin-left:0;}
+  .view-head .btn-primary, .view-head .btn-secondary{min-height:42px;}
+  .stat-row{grid-template-columns:1fr 1fr !important; gap:10px; margin-bottom:var(--sp-4);}
+  .stat-card{padding:var(--sp-3) var(--sp-4);}
+  .stat-value{font-size:var(--fs-xl);}
+  .hero-signal{padding:var(--sp-4);}
+  .hero-signal-value{font-size:var(--fs-2xl);}
+  .card{padding:var(--sp-4);}
+  .dash-grid{grid-template-columns:1fr;}
+  .trace-grid, .map-layout{grid-template-columns:1fr;}
+  .metric-card{padding:var(--sp-3) var(--sp-4);}
+
+  /* ---- forms: 16px stops iOS zoom; comfortable tap height ---- */
+  .view input, .view select, .view textarea, .modal-box input, .modal-box select, .modal-box textarea{font-size:16px !important; min-height:44px;}
+  .view button, .modal-box button{min-height:40px;}
+  .btn-primary, .btn-secondary{min-height:42px; padding-top:10px; padding-bottom:10px;}
+  .btn-sm{min-height:36px !important;}
+  .new-trace-form{flex-direction:column;}
+  .new-trace-form input, .new-trace-form select{width:100%; min-width:0;}
+  #reassignSelect{min-width:0 !important; width:100%;}
+  .filter-row{flex-wrap:nowrap; overflow-x:auto; margin-left:calc(var(--sp-4) * -1); margin-right:calc(var(--sp-4) * -1); padding:0 var(--sp-4) 4px; scrollbar-width:none;}
+  .filter-row::-webkit-scrollbar{display:none;}
+  .filter-chip{flex-shrink:0; min-height:36px; padding:7px 14px;}
+
+  /* ---- tables: scroll inside their card; cards replace them where a card list exists ---- */
+  .table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  .case-table{min-width:560px;}
+  .case-table th, .case-table td{padding:11px 12px;}
+  .table-wrap.responsive-table:has(+ .case-cards){display:none;}
+  .case-cards{display:flex;}
+  .split-table{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  .split-table th, .split-table td{padding:9px 10px;}
+  .audit-row{grid-template-columns:1fr; gap:2px;}
+
+  /* ---- graphs: keep them readable - pan sideways inside the card, don't shrink to a blur ---- */
+  .graph-svg-wrap{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .graph-svg-wrap svg{min-width:520px;}
+  #networkSvgHost{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  #networkSvgHost svg{min-width:560px;}
+  .geo-trail-svg{max-height:220px;}
+  .graph-node-popup, .india-map-tooltip{max-width:calc(100vw - 32px);}
+
+  /* ---- detail widgets ---- */
+  .shap-row{grid-template-columns:92px 1fr 40px;}
+  .model-metric-row{grid-template-columns:1fr; gap:6px;}
+  .syndicate-grid{grid-template-columns:1fr;}
+  .syndicate-card{padding:var(--sp-4);}
+  .syndicate-metrics{gap:6px;}
+  .copilot-evidence-row{grid-template-columns:1fr;}
+  .formula-line{font-size:var(--fs-2xs);}
+  .ledger-sub, .case-wallet, .case-card-wallet, .notice-doc{overflow-wrap:anywhere; word-break:break-word;}
+  .timeline-replay-head{gap:8px; flex-wrap:wrap;}
+
+  /* ---- action rows: full-width thumb-friendly buttons ---- */
   .action-row{flex-direction:column;}
   .action-row .btn-primary, .action-row .btn-secondary{width:100%; justify-content:center;}
+
+  /* ---- modal -> bottom sheet ---- */
+  .modal-veil{padding:0; align-items:flex-end;}
+  .modal-box{
+    width:100%; max-width:100%; height:92vh; height:92dvh; max-height:92dvh; border-radius:var(--r-lg) var(--r-lg) 0 0;
+    padding:var(--sp-4) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom)); animation:sheet-up var(--dur-slow) var(--ease);
+  }
+  .modal-actions{flex-direction:column-reverse;}
+  .modal-actions > *{width:100%; justify-content:center;}
+  .notice-type-grid{grid-template-columns:1fr;}
+  .stepper-box{padding:var(--sp-5); width:92vw;}
+
+  /* ---- toasts float above the bottom nav ---- */
+  #toastHost{bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 12px); padding:0 12px;}
+  .toast{max-width:100%;}
 }
 
-/* ============ tablet 768–1023 tune (explicit per spec's 3 test widths) ============ */
-@media (min-width:768px) and (max-width:1023px){
-  .trace-grid{grid-template-columns:1fr;}
+/* ============ below 480px - small phones ============ */
+@media (max-width: 480px){
+  .view-title{font-size:var(--fs-lg);}
+  .stat-label{font-size:var(--fs-2xs);}
+  .attribution-card .head{flex-direction:column; align-items:flex-start;}
+  .attribution-card .conf{margin-left:0;}
+  .tb-mode{display:none;}
+  .syndicate-metrics{grid-template-columns:1fr 1fr;}
+  .more-grid{grid-template-columns:1fr;}
+}
+
+/* very narrow (320px) devices */
+@media (max-width: 350px){
+  .stat-row{grid-template-columns:1fr !important;}
+  .topbar .brandmark-name{display:none;}
 }

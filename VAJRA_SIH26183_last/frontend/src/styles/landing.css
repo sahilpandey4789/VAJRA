@@ -5,7 +5,7 @@
   toggle (unlike the console's fixed-dark topbar/sidebar), since this is
   the public marketing site.
 */
-#landingScreen{display:block; background:var(--paper); color:var(--text); min-height:100vh;}
+#landingScreen{display:block; overflow-x:clip; max-width:100%; background:var(--paper); color:var(--text); min-height:100vh;}
 #landingScreen.hide{display:none;}
 
 #landingScreen section{padding:88px max(24px, calc((100% - 1080px) / 2));}
@@ -40,6 +40,7 @@ html[data-theme="dark"] #landingNav .brandmark svg{stroke:var(--copper);}
   transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 .l-btn:hover{transform:translateY(-1px);}
+.drawer-actions{display:none;}
 .l-btn-ghost{color:var(--text); border:1px solid var(--line-strong); background:transparent;}
 .l-btn-ghost:hover{border-color:var(--copper); background:var(--panel-2);}
 .l-btn-solid{background:var(--accent-gradient); color:var(--accent-ink); border:1px solid transparent; font-weight:700;}
@@ -126,7 +127,7 @@ html[data-theme="dark"] .pipeline-step .num{color:var(--copper);}
 
 /* ---- demo ---- */
 #landingDemo{
-  background:var(--ink); color:var(--paper-text); border-radius:var(--r-lg); margin:0 max(24px, calc((100% - 1080px) / 2));
+  background:var(--ink); color:var(--paper-text); border-radius:var(--r-lg); margin:0;
   padding:56px 48px; position:relative; overflow:hidden;
 }
 #landingDemo::before{
@@ -188,16 +189,54 @@ html[data-theme="light"] .demo-signin-ghost{border-color:var(--line-strong);}
 @keyframes hero-line-flow{to{stroke-dashoffset:-90;}}
 html[data-theme="light"] .hero-cyber-bg{opacity:.35;}
 
+/* ---- nav collapses early: 5 links + 4 buttons don't fit below ~1180px ---- */
+@media (max-width:1180px){
+  #landingNav{gap:14px;}
+  .nav-act-extra{display:none;}
+  #landingNavLinks{
+    position:fixed; top:0; right:0; bottom:0; width:min(82vw, 320px); background:var(--panel-2);
+    flex-direction:column; align-items:flex-start; padding:80px 24px 24px; gap:20px; box-shadow:var(--shadow-lg);
+    transform:translateX(105%); visibility:hidden; transition:transform var(--dur-base) var(--ease), visibility 0s linear var(--dur-base); z-index:49; margin-left:0;
+    overflow-y:auto;
+  }
+  #landingNavLinks.open{transform:none; visibility:visible; transition:transform var(--dur-base) var(--ease);}
+  #landingNavToggle{display:flex;}
+  .drawer-actions{display:flex; flex-direction:column; gap:10px; width:100%; margin-top:8px; padding-top:20px; border-top:1px solid var(--line);}
+  .drawer-actions .l-btn{width:100%; text-align:center; padding:12px 16px;}
+  .drawer-auth{display:none;}
+  /* backdrop-filter on the nav would trap the fixed drawer inside the 70px nav bar */
+  #landingNav.scrolled{backdrop-filter:none; background:var(--paper);}
+}
+@media (max-width:640px){
+  .nav-act-auth{display:none;}
+  .drawer-auth{display:block;}
+  #landingNav{padding:12px 16px; gap:8px;}
+  .gov-badge{display:none;}
+}
+
 @media (max-width:860px){
   .hero-grid, .about-grid, .demo-inner{grid-template-columns:1fr;}
   .hero-art{order:-1;}
   .pipeline{grid-template-columns:1fr;}
-  #landingNavLinks{
-    position:fixed; top:0; right:0; bottom:0; width:min(78vw, 300px); background:var(--panel-2);
-    flex-direction:column; align-items:flex-start; padding:80px 24px 24px; gap:20px; box-shadow:var(--shadow-lg);
-    transform:translateX(100%); transition:transform var(--dur-base) var(--ease); z-index:49;
-  }
-  #landingNavLinks.open{transform:none;}
-  #landingNavToggle{display:flex;}
-  #landingDemo{padding:40px 24px; margin:0 16px;}
+  #landingDemo{padding:40px 24px; margin:0;}
+}
+
+/* ---- phones ---- */
+@media (max-width:640px){
+  #landingScreen section{padding:48px 20px;}
+  #landingHero{padding-top:28px; padding-bottom:40px;}
+  .hero-grid{gap:28px;}
+  .hero-grid > *{min-width:0;}
+  #landingHero h1{max-width:none;}
+  .hero-story{margin:16px 0 22px;}
+  .hero-ctas{flex-direction:column; gap:10px; margin-bottom:30px;}
+  .hero-ctas .l-btn{width:100%; text-align:center;}
+  .hero-stats{grid-template-columns:1fr;}
+  .hero-stat{border-right:none; border-bottom:1px solid var(--line); padding:14px 0;}
+  .hero-stat:last-child{border-bottom:none;}
+  .hero-art .card{max-width:none; padding:18px;}
+  .hero-art .card-foot{flex-direction:column; gap:4px;}
+  .l-section-head{margin-bottom:28px;}
+  .demo-cta .l-btn{width:100%; text-align:center;}
+  .foot-row{flex-direction:column; align-items:flex-start;}
 }
