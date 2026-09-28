@@ -71,6 +71,9 @@ export default function Landing({ onAuth, onReport, onTrack }) {
           <span className="gov-badge"><span dangerouslySetInnerHTML={{ __html: ICONS.chakra }} />Govt. of India</span>
         </div>
         <div id="landingNavLinks" className={menuOpen ? "open" : ""}>
+          <button className="landing-nav-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>
+          </button>
           <a href="#landingHero" onClick={scrollTo("landingHero")}>Home</a>
           <a href="#landingCapabilities" onClick={scrollTo("landingCapabilities")}>Capabilities</a>
           <a href="#landingFeatures" onClick={scrollTo("landingFeatures")}>How it works</a>
@@ -83,6 +86,7 @@ export default function Landing({ onAuth, onReport, onTrack }) {
             <button className="l-btn l-btn-solid drawer-auth" onClick={() => { setMenuOpen(false); onAuth("signup"); }}>Create account</button>
           </div>
         </div>
+        {menuOpen && <div className="landing-nav-veil" onClick={() => setMenuOpen(false)} aria-hidden="true"></div>}
         <div className="l-nav-spacer"></div>
         <div className="l-nav-actions">
           <button className="l-icon-btn" id="landingThemeBtn" title="Toggle theme" aria-label="Toggle theme" onClick={toggleTheme}>
