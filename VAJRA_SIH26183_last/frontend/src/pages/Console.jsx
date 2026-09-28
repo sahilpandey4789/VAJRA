@@ -18,11 +18,6 @@ import { renderVault } from "../console-core/views/vault.js";
 import { renderAudit } from "../console-core/views/audit.js";
 import { renderAbout } from "../console-core/views/about.js";
 
-// "dashboard" is a real React component (components/Dashboard.jsx),
-// mounted directly in JSX below instead of through this imperative
-// legacy-renderer map. Every other view is still the pre-existing
-// hand-rolled-DOM renderer - see docs/BUILT_VS_ROADMAP.md for the
-// tradeoffs of converting the rest.
 const VIEW_RENDERERS = {
   trace: renderTrace, notices: renderNotices,
   exchanges: renderExchanges, network: renderNetwork, syndicates: renderSyndicates,
@@ -64,21 +59,11 @@ export default function Console() {
   const stateRef = useRef({ view, cases, activeCaseId });
   stateRef.current = { view, cases, activeCaseId };
 
-  // Legacy views (trace's live-trace stepper, notices' modal) mount a
-  // full-screen overlay directly on document.body - outside React's tree,
-  // so React unmounting the view on navigation does NOT remove it. If the
-  // user navigates away while one is still open, it's left behind as an
-  // invisible-ish position:fixed, inset:0, high-z-index layer that blocks
-  // every click underneath it - including the sidebar's own nav buttons,
-  // which made it look like navigation itself was broken. Belt-and-braces
-  // fix: force both closed on every navigate(), not just on their own
-  // cancel/close handlers.
   const navigate = useCallback((v) => {
     document.getElementById("stepperOverlay")?.classList.remove("show");
     document.getElementById("modalVeil")?.classList.remove("show");
     setShowMore(false);
     setView(v);
-    // legacy views share one scroll container - always start a new page at the top
     document.getElementById("mainContent")?.scrollTo?.({ top: 0 });
   }, []);
 
@@ -98,7 +83,6 @@ export default function Console() {
     registerLiveRefresh: (v, cb) => { liveRefreshHandlers.current[v] = cb; },
   };
 
-  // load the case queue (sidebar list + bell badge)
   const loadQueue = useCallback(async () => {
     try {
       const list = await api.listCases();
@@ -112,21 +96,6 @@ export default function Console() {
   useEffect(() => { loadQueue(); }, [loadQueue]);
   useEffect(() => { setMode(api.getMode()); }, [view]);
 
-  // mount the active view's legacy renderer into the container div - // skipped for "dashboard", which is real React and rendered in JSX below
-  //
-  // Every legacy renderer (trace, notices, network, exchanges, syndicates,
-  // vault, audit, about) is `async` and fetches data with `await` BEFORE
-  // writing container.innerHTML. Because this single container div is
-  // reused across all legacy views (same React key), a fast nav click
-  // (or a slow network response) can let an OLD view's fetch resolve
-  // AFTER the user has already moved to a different view, and it then
-  // overwrites whatever the new view just rendered - "dono page reh
-  // jaana". Two guards close that race:
-  //   1. Wipe the container synchronously the moment `view` changes, so a
-  //      previous view's markup never lingers into the next view's paint.
-  //   2. Tag this render with the view/container it belongs to, and once
-  //      its promise settles, wipe again if that view/container is no
-  //      longer current - so a late-arriving stale write never sticks.
   useEffect(() => {
     if (view !== "dashboard" && view !== "reports" && viewContainerRef.current) {
       const container = viewContainerRef.current;
@@ -140,7 +109,6 @@ export default function Console() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, activeCaseId]);
 
-  // real-time alert stream
   useEffect(() => {
     const handle = api.subscribeAlerts({
       onAlert: (event, data) => {
@@ -151,10 +119,6 @@ export default function Console() {
         }
         loadQueue();
         const current = stateRef.current.view;
-        // Dashboard (real React) registers its own refresh via
-        // ctx.registerLiveRefresh in its useEffect, same mechanism the
-        // legacy views already used - no dashboard-specific special case
-        // needed here any more.
         if (liveRefreshHandlers.current[current]) liveRefreshHandlers.current[current]();
       },
     });
@@ -166,7 +130,6 @@ export default function Console() {
   const activeCase = cases.find((c) => c.id === activeCaseId);
   const highRiskCases = cases.filter((c) => c.risk_band === "high");
 
-  // close the notification dropdown on an outside click
   useEffect(() => {
     if (!showNotif) return;
     const onDocClick = (e) => {
@@ -291,6 +254,9 @@ export default function Console() {
       {showMore && (
         <div className="more-sheet" role="dialog" aria-label="All sections">
           <div className="more-grip" aria-hidden="true"></div>
+          <button className="more-close" aria-label="Close" onClick={() => setShowMore(false)}>
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>
+          </button>
           <div className="more-grid">
             {NAV_ITEMS.filter((n) => !n.adminOnly || officer.role === "admin").map((n) => (
               <button key={n.view} className={`more-item ${view === n.view ? "active" : ""}`} onClick={() => navigate(n.view)}>
